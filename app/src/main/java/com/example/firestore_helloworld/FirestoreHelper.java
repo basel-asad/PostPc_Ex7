@@ -21,6 +21,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.gson.Gson;
 
 import java.util.HashMap;
@@ -41,6 +42,7 @@ class FirestoreHelper extends AppCompatActivity {
     String order_id = "";
     protected Order running_order = null;
     protected static LiveData<Order> orderLiveData = null;
+    static ListenerRegistration registration = null;
 
     private FirestoreHelper(){
 //        this.save_db_to_sp();  todo: make this
@@ -63,7 +65,11 @@ class FirestoreHelper extends AppCompatActivity {
                 else{
                     ((loading_screen) context).next_screen(true, fh);
                 }
-            } else {
+            }
+            else if(fh.client_name.equals("")) {
+                ((loading_screen) context).next_screen(true, fh);
+            }
+            else{
                 fh.send_broadcast("no_order_found", "", context);
             }
         }
@@ -94,9 +100,12 @@ class FirestoreHelper extends AppCompatActivity {
 
 
     public void keep_tabs(String order_id){
-        Toast.makeText(context, "listeningggggg", Toast.LENGTH_SHORT).show();
+        //todo: kill listener when cancelling order
+        Toast.makeText(context, "listeningggggg strat", Toast.LENGTH_SHORT).show();
+
         DocumentReference docRef = firestore.collection("orders").document(order_id);
-        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        unregister_listener();
+        registration = docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -105,12 +114,37 @@ class FirestoreHelper extends AppCompatActivity {
                 }
 
                 if (documentSnapshot != null && documentSnapshot.exists()) {
+
+                    Toast.makeText(context, "listeningggggg update", Toast.LENGTH_SHORT).show();
+                    String status = (String) documentSnapshot.getData().get("status");
+                    if(status.equals("done")){
+                        // kill listener
+                        unregister_listener();
+
+                    }
+                    else if(! status.equals(fh.running_order.status)){
+                        // status changed
+                        send_broadcast("order_changed", order_id, context);
+
+                    }
+                    fh.running_order = new Order(documentSnapshot.getData());
+                    orderLiveData = fh._downloadOrder(order_id);
+
+
                     System.out.println("Current data: " + documentSnapshot.getData());
                 } else {
                     System.out.print("Current data: null");
                 }
             }
         });
+    }
+
+    private void unregister_listener(){
+        if(registration != null){
+            // Stop listening to changes
+            registration.remove();
+            registration = null;
+        }
     }
 
     public boolean keep_track_of_order(String order_id) {
@@ -183,7 +217,6 @@ class FirestoreHelper extends AppCompatActivity {
                     running_order = order;
                     liveData.setValue(order);
 
-                    keep_tabs(order_id); //todo!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //                    //todo: change liveData from herE?
 //                    orderLiveData = liveData;
                 }
@@ -252,7 +285,7 @@ class FirestoreHelper extends AppCompatActivity {
     }
 
     public void edit_order(String unique_order_id, int num_of_pickles, boolean hummus, boolean tahini,
-                          String comment){
+                          String comment, String new_status){
 
         Map<String, Object> order = new HashMap<>();
         order.put("id", unique_order_id);
@@ -261,7 +294,9 @@ class FirestoreHelper extends AppCompatActivity {
         order.put("hummus", hummus);
         order.put("tahini", tahini);
         order.put("comment", comment);
-//        order.put("status", orderLiveData.getValue().status);
+        if(new_status != null) {
+            order.put("status", new_status);
+        }
 
 
         // Add a new document with a generated ID
@@ -286,6 +321,8 @@ class FirestoreHelper extends AppCompatActivity {
             }
         });
     }
+
+
 
     public void cancel_order(String unique_order_id){
 
@@ -356,6 +393,7 @@ class FirestoreHelper extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregister_listener();
         this.save_db_to_sp();
     }
 
@@ -394,11 +432,15 @@ class FirestoreHelper extends AppCompatActivity {
     }
 
     public void reset_order_data(){
-        order_id = "";
-        running_order = new Order();
-        orderLiveData = null;
+        if (fh != null) {
+            fh.order_id = "";
+            fh.running_order = new Order();
+            FirestoreHelper.orderLiveData = null;
+            unregister_listener();
+        }
         save_db_to_sp();
     }
+
 
 }
 

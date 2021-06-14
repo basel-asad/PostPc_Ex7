@@ -10,16 +10,23 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FireStore_helloWorld">
         <activity android:name=".order_ready_activity_screen"
-            android:launchMode="singleInstance"/>
-        <activity android:name=".MainActivity"
-            android:launchMode="singleInstance"/>
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait" />
+        <activity android:name=".Username_activity"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"/>
         <activity android:name=".order_in_the_making_screen"
-            android:launchMode="singleInstance"/>
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"/>
         <activity android:name=".edit_order_activity_screen"
-            android:launchMode="singleInstance"/>
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"/>
         <activity android:name=".new_order_activity_screen"
-            android:launchMode="singleInstance"/>
-        <activity android:name=".loading_screen">
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".loading_screen"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

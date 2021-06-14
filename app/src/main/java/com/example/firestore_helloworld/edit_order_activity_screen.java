@@ -224,7 +224,7 @@ public class edit_order_activity_screen extends AppCompatActivity {
             //todo: check status before sending the order, could be in the making!
             int pickle_num = Integer.parseInt(num_of_pickles_tv.getText().toString());
             inst.edit_order(inst.order_id,pickle_num, hummus_CB.isChecked(), tahini_CB.isChecked(),
-                    comment_et.getText().toString());
+                    comment_et.getText().toString(),null);
         }
     }
 

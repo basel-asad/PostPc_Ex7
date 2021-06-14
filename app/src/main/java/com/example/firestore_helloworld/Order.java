@@ -25,6 +25,18 @@ public class Order {
 
     }
 
+    public Order(Order other_order){
+        // copy constructor
+        this.customer_name = other_order.customer_name;
+        this.unique_order_id = other_order.unique_order_id;
+        this.num_of_pickles = other_order.num_of_pickles;
+        this.hummus = other_order.hummus;
+        this.tahini = other_order.tahini;
+        this.comment = other_order.comment;
+        this.status = other_order.status;
+
+    }
+
     public Order(Map<String, Object> order_data){
         this.customer_name = (String) order_data.get("customer-name");
         this.unique_order_id = (String) order_data.get("id");

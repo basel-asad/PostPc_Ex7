@@ -42,6 +42,7 @@ public class loading_screen extends AppCompatActivity {
 
 //            finish();
 //            next_screen();
+            fh.keep_tabs(fh.order_id); //todo!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         }
 
     };
@@ -97,7 +98,6 @@ public class loading_screen extends AppCompatActivity {
 
         registerReceiver(no_order_Receiver, new IntentFilter("no_order_found"));
 
-
         fh = FirestoreHelper.get_instance(loading_screen.this);
 
     }
@@ -109,9 +109,12 @@ public class loading_screen extends AppCompatActivity {
         if(finish){
             finish();
         }
-        String status = fh.running_order.status;
-//            finish();
-        go_to_order_screen(status); //todo: swicth screens
+        if(fh.running_order != null) {
+            go_to_order_screen(fh.running_order.status, fh.running_order.customer_name); //todo: swicth screens
+        }
+        else{
+            go_to_order_screen("", ""); //todo: swicth screens
+        }
 
     }
 
@@ -140,9 +143,13 @@ public class loading_screen extends AppCompatActivity {
 //        this.startActivity(new Intent(this.getApplicationContext(), new_order_activity_screen.class));
 //    }
 
-    protected void go_to_order_screen(String status) {
+    protected void go_to_order_screen(String status, String client_name) {
         finish();
-        if (status.equals("waiting")) {
+        if(client_name.equals("") && status.equals("")){
+            // show "edit order" screen
+            this.startActivity(new Intent(this, Username_activity.class));
+        }
+        else if (status.equals("waiting")) {
             // show "edit order" screen
             this.startActivity(new Intent(this, edit_order_activity_screen.class));
         }
@@ -156,14 +163,15 @@ public class loading_screen extends AppCompatActivity {
             this.startActivity(new Intent(this, order_ready_activity_screen.class));
 
         }
-        else  if(status.equals("cancelled")){
+//        else  if(status.equals("cancelled")){
+        else if(status.equals("cancelled") || status.equals("done")){
             Toast.makeText(loading_screen.this, "cancelled! ", Toast.LENGTH_LONG).show();
             // make new order
             this.startActivity(new Intent(this, new_order_activity_screen.class));
 
         }
         else{
-            Toast.makeText(this, "wtfff!!!!!!!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "wtfff!!!!!!!"+status, Toast.LENGTH_SHORT).show();
             //todo: throw this
             //- no order / order with status "done": delete the order id from the phone and show screen "add new order"
 //            throw new Exception("not supposed to happen");

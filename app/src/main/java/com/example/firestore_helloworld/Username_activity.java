@@ -13,7 +13,7 @@ import android.widget.Toast;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-public class MainActivity extends AppCompatActivity {
+public class Username_activity extends AppCompatActivity {
 //    public FirebaseFirestore db;
     public EditText name_edit_text;
     FirestoreHelper inst;
