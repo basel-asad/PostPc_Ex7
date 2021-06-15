@@ -44,6 +44,8 @@ class FirestoreHelper extends AppCompatActivity {
     protected static LiveData<Order> orderLiveData = null;
     static ListenerRegistration registration = null;
 
+
+
     private FirestoreHelper(){
 //        this.save_db_to_sp();  todo: make this
     }
