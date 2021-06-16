@@ -15,8 +15,6 @@ public class order_ready_activity_screen extends AppCompatActivity {
     private BroadcastReceiver order_edited_success_Receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(order_ready_activity_screen.this, "order reset successfully", Toast.LENGTH_SHORT).show();
-
             //reset order & start a new order screen
             start_new_order();
         }
@@ -30,16 +28,6 @@ public class order_ready_activity_screen extends AppCompatActivity {
         }
 
     };
-    /**
-     * 4. An "your order is ready!" screen. when the order status is "ready" this will be the only screen that the user will see.
-     * in this screen: let the user know that Rachel is in campus with their sandwich. the user will have some way of acknowledge (for example, a "got it" button). once the user acknowledge, we will mark this order as done and will navigate the user to the "new order" screen.
-     *
-     * - once you showed the customer that the sandwich is ready, you change the state to "done" and both you and Rachel can stop looking at this order.
-     * - once the user acknowledge, we will mark this order as done and will navigate the user to the "new order" screen.
-     *
-     * ++ - no order / order with status "done": delete the order id from the phone and show screen "add new order".
-     *
-     */
 
     FirestoreHelper inst;
 
@@ -62,7 +50,7 @@ public class order_ready_activity_screen extends AppCompatActivity {
         inst.edit_order(order.unique_order_id,order.num_of_pickles,order.hummus,order.tahini,
                 order.comment,"done");
         //reset order and go to new order when 'order_edited_success_Receiver' is triggered
-//        start_new_order();
+//        start_new_order(); // done from broadcast receiver
     }
 
     private void start_new_order(){
@@ -87,14 +75,11 @@ public class order_ready_activity_screen extends AppCompatActivity {
 
     private void save_empty_order_to_sp(){
         SharedPreferences mprefs = this.getSharedPreferences("order_so_far", MODE_PRIVATE);
-
         SharedPreferences.Editor editor = mprefs.edit();
-
         editor.putString("pickles_num", "0");
         editor.putString("comment", "");
         editor.putBoolean("tahini_checked?", false);
         editor.putBoolean("hummus_checked?", false);
-
         editor.apply();
     }
 }

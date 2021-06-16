@@ -10,14 +10,11 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 public class loading_screen extends AppCompatActivity {
+    FirestoreHelper fh;
 
     private BroadcastReceiver order_added_success_Receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-//            Toast.makeText(loading_screen.this, "order added scuccess in (loading)", Toast.LENGTH_LONG).show();
-
-//            finish();
-//            next_screen();
         }
 
     };
@@ -25,11 +22,8 @@ public class loading_screen extends AppCompatActivity {
     private BroadcastReceiver order_changed_Receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-//            if(context.getClass() == loading_screen.class) {
-                Toast.makeText(loading_screen.this, "order changed (loading)", Toast.LENGTH_LONG).show();
-
                 finish();
-                next_screen(false, fh); //todo: do we want to do this here? order isnt supposed to change when were in this window?
+                next_screen(false, fh);
             }
 //        }
 
@@ -38,11 +32,8 @@ public class loading_screen extends AppCompatActivity {
     private BroadcastReceiver order_fetched_Receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-//            Toast.makeText(loading_screen.this, "fetched (from loading)", Toast.LENGTH_LONG).show();
-
-//            finish();
-//            next_screen();
-            fh.keep_tabs(fh.order_id); //todo!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // add listener to order
+            fh.keep_tabs(fh.order_id);
         }
 
     };
@@ -50,11 +41,9 @@ public class loading_screen extends AppCompatActivity {
     private BroadcastReceiver no_order_Receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(loading_screen.this, "noooo order (loading)", Toast.LENGTH_SHORT).show();
             finish();
             // get new order
             loading_screen.this.startActivity(new Intent(loading_screen.this, new_order_activity_screen.class));
-
         }
 
     };
@@ -63,27 +52,12 @@ public class loading_screen extends AppCompatActivity {
     private BroadcastReceiver order_add_fail_Receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(loading_screen.this, "order add failed ", Toast.LENGTH_LONG).show();
-
-
             finish();
             loading_screen.this.startActivity(new Intent(loading_screen.this, new_order_activity_screen.class));
 
         }
 
     };
-
-
-
-
-
-
-
-
-
-
-
-    FirestoreHelper fh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,10 +84,11 @@ public class loading_screen extends AppCompatActivity {
             finish();
         }
         if(fh.running_order != null) {
-            go_to_order_screen(fh.running_order.status, fh.running_order.customer_name); //todo: swicth screens
+            go_to_order_screen(fh.running_order.status, fh.running_order.customer_name);
         }
         else{
-            go_to_order_screen("", ""); //todo: swicth screens
+            // set a new username
+            go_to_order_screen("", "");
         }
 
     }
@@ -121,7 +96,6 @@ public class loading_screen extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        Toast.makeText(this,"loading done", Toast.LENGTH_SHORT).show();
 
         unregisterReceiver(order_added_success_Receiver);
         unregisterReceiver(order_add_fail_Receiver);
@@ -133,15 +107,6 @@ public class loading_screen extends AppCompatActivity {
         this.fh.save_db_to_sp();
 
     }
-
-//    protected void restart_order(){
-//        this.fh.order_id = "";
-//        this.fh.running_order = null;
-//        this.fh.save_db_to_sp();
-//        // show "add new order
-//        finish();
-//        this.startActivity(new Intent(this.getApplicationContext(), new_order_activity_screen.class));
-//    }
 
     protected void go_to_order_screen(String status, String client_name) {
         finish();
@@ -163,19 +128,14 @@ public class loading_screen extends AppCompatActivity {
             this.startActivity(new Intent(this, order_ready_activity_screen.class));
 
         }
-//        else  if(status.equals("cancelled")){
         else if(status.equals("cancelled") || status.equals("done")){
-            Toast.makeText(loading_screen.this, "cancelled! ", Toast.LENGTH_LONG).show();
+//            Toast.makeText(loading_screen.this, "cancelled/done ! ", Toast.LENGTH_LONG).show();
             // make new order
             this.startActivity(new Intent(this, new_order_activity_screen.class));
 
         }
         else{
-            Toast.makeText(this, "wtfff!!!!!!!"+status, Toast.LENGTH_SHORT).show();
-            //todo: throw this
-            //- no order / order with status "done": delete the order id from the phone and show screen "add new order"
-//            throw new Exception("not supposed to happen");
-
+            Toast.makeText(this, "status unidentified : '" + status + "'", Toast.LENGTH_SHORT).show();
         }
     }
 }

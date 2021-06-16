@@ -18,10 +18,6 @@ public class edit_order_activity_screen extends AppCompatActivity {
     private BroadcastReceiver order_fetched_Receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-//            Toast.makeText(edit_order_activity_screen.this, "order fetched in edit?1", Toast.LENGTH_LONG).show();
-//
-//            //todo: set the changes?
-
         }
 
     };
@@ -29,8 +25,6 @@ public class edit_order_activity_screen extends AppCompatActivity {
     private BroadcastReceiver order_added_success_Receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-//            Toast.makeText(edit_order_activity_screen.this, "order added in edit?1", Toast.LENGTH_LONG).show();
-
         }
 
     };
@@ -39,41 +33,29 @@ public class edit_order_activity_screen extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             save_enabled = false;
-            Toast.makeText(edit_order_activity_screen.this, "order changed (edit)", Toast.LENGTH_LONG).show();
-
-            if(!inst.running_order.status.equals("waiting")){
+//            Toast.makeText(edit_order_activity_screen.this, "order changed (edit)", Toast.LENGTH_LONG).show();
+            if (!inst.running_order.status.equals("waiting")) {
                 finish();
                 edit_order_activity_screen.this.startActivity(new Intent(edit_order_activity_screen.this, loading_screen.class));
             }
-//
-//            //todo: check if status is in_progress
-//
-//            // todo: order changed, what chenged? all of it?
-//            finish();
-//            new_order_activity_screen.this.startActivity(new Intent(new_order_activity_screen.this, loading_screen.class));
+
             save_enabled = true;
             editing_enabled = true;
+            cancel_enabled = true;
 
         }
 
     };
 
 
-
-
-
-
     private BroadcastReceiver order_edited_success_Receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             save_enabled = false;
-//            Toast.makeText(edit_order_activity_screen.this, "order edited successfully", Toast.LENGTH_LONG).show();
-
-//            finish();
-//            edit_order_activity_screen.this.startActivity(new Intent(edit_order_activity_screen.this, loading_screen.class));
-
+            Toast.makeText(edit_order_activity_screen.this, "changes Saved!", Toast.LENGTH_SHORT).show();
             save_enabled = true;
             editing_enabled = true;
+            cancel_enabled = true;
 
         }
 
@@ -83,45 +65,31 @@ public class edit_order_activity_screen extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             save_enabled = false;
-            Toast.makeText(edit_order_activity_screen.this, "order editing failed", Toast.LENGTH_LONG).show();
+            Toast.makeText(edit_order_activity_screen.this, "order editing failed, try again!", Toast.LENGTH_LONG).show();
 
             save_enabled = true;
             editing_enabled = true;
+            cancel_enabled = true;
+
         }
 
     };
-
-
-
 
 
     private BroadcastReceiver order_add_fail_Receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-//            Toast.makeText(edit_order_activity_screen.this, "order adding failed in edit?1", Toast.LENGTH_LONG).show();
-//
-//            // failed to add order, show message and re-enable save button
-//
-//            save_enabled = true;
-
         }
 
     };
 
 
-
-
-
     private BroadcastReceiver order_cancel_failed_receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(edit_order_activity_screen.this, "order cancel failed in edit?1", Toast.LENGTH_LONG).show();
-
-            // failed to add order, show message and re-enable save button
-
-            save_enabled = true;
+            Toast.makeText(edit_order_activity_screen.this, "order cancel failed", Toast.LENGTH_LONG).show();
             cancel_enabled = true;
-            editing_enabled = true;
+
         }
 
     };
@@ -129,17 +97,15 @@ public class edit_order_activity_screen extends AppCompatActivity {
     private BroadcastReceiver order_cancel_success_receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(edit_order_activity_screen.this, "order cancel successful ", Toast.LENGTH_LONG).show();
+//            Toast.makeText(edit_order_activity_screen.this, "order cancel successful ", Toast.LENGTH_LONG).show();
             editing_enabled = false;
             save_enabled = false;
             cancel_enabled = false;
 
             reset_fields();
-
             finish();
             inst.reset_order_data();
             edit_order_activity_screen.this.startActivity(new Intent(edit_order_activity_screen.this, loading_screen.class));
-
 
             save_enabled = true;
             cancel_enabled = true;
@@ -148,20 +114,6 @@ public class edit_order_activity_screen extends AppCompatActivity {
         }
 
     };
-
-
-
-
-
-
-    /**
-     * 2. An "edit your order" screen.
-         * As long as the order is still in status "waiting", the user can edit the order.
-         * if the customer kills the app and re-launches it, and their order is still in status
-         * "waiting", they will get immediately to this screen.
-         * in this screen: let the user edit any of the order's ingredients & comments.
-         * let the user delete the order.
-     */
 
     SharedPreferences mprefs;
     FirestoreHelper inst;
@@ -191,9 +143,7 @@ public class edit_order_activity_screen extends AppCompatActivity {
         registerReceiver(order_cancel_success_receiver, new IntentFilter("order_cancelled_successfully"));
         registerReceiver(order_cancel_failed_receiver, new IntentFilter("order_cancellation_failed"));
 
-        //todo: load order details to show in UI
         mprefs = this.getSharedPreferences("order_so_far", MODE_PRIVATE);
-
         inst = FirestoreHelper.get_instance(edit_order_activity_screen.this);
 
         // get views
@@ -205,9 +155,8 @@ public class edit_order_activity_screen extends AppCompatActivity {
     }
 
 
-    public void cancel_button_clicked(android.view.View cancel_button){
-        //todo: cancel
-        if(cancel_enabled){
+    public void cancel_button_clicked(android.view.View cancel_button) {
+        if (cancel_enabled) {
             editing_enabled = false;
             save_enabled = false;
             cancel_enabled = false;
@@ -216,20 +165,19 @@ public class edit_order_activity_screen extends AppCompatActivity {
 
     }
 
-    public void save_button_clicked(android.view.View button){
-        if(save_enabled && editing_enabled) {
+    public void save_button_clicked(android.view.View button) {
+        if (save_enabled && editing_enabled && cancel_enabled) {
             editing_enabled = false;
             save_enabled = false;
-            // todo: modify existing order
-            //todo: check status before sending the order, could be in the making!
+            cancel_enabled = false;
             int pickle_num = Integer.parseInt(num_of_pickles_tv.getText().toString());
-            inst.edit_order(inst.order_id,pickle_num, hummus_CB.isChecked(), tahini_CB.isChecked(),
-                    comment_et.getText().toString(),null);
+            inst.edit_order(inst.order_id, pickle_num, hummus_CB.isChecked(), tahini_CB.isChecked(),
+                    comment_et.getText().toString(), null);
         }
     }
 
-    public void plus_pressed(android.view.View plus_button){
-        if(editing_enabled) {
+    public void plus_pressed(android.view.View plus_button) {
+        if (editing_enabled) {
             int prev = Integer.parseInt(num_of_pickles_tv.getText().toString());
             if (prev < 10) {
                 num_of_pickles_tv.setText(String.valueOf(prev + 1));
@@ -237,8 +185,8 @@ public class edit_order_activity_screen extends AppCompatActivity {
         }
     }
 
-    public void minus_pressed(android.view.View plus_button){
-        if(editing_enabled) {
+    public void minus_pressed(android.view.View plus_button) {
+        if (editing_enabled) {
             int prev = Integer.parseInt(num_of_pickles_tv.getText().toString());
             if (prev > 0) {
                 num_of_pickles_tv.setText(String.valueOf(prev - 1));
@@ -250,7 +198,6 @@ public class edit_order_activity_screen extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        // todo: save screen info
 
         outState.putString("pickles_num", this.num_of_pickles_tv.getText().toString());
         outState.putString("comment", this.comment_et.getText().toString());
@@ -261,10 +208,9 @@ public class edit_order_activity_screen extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        // todo: load screen info
 
         this.num_of_pickles_tv.setText(savedInstanceState.getString("pickles_num", "0"));
-        this.comment_et.setText(savedInstanceState.getString("comment", "0"));
+        this.comment_et.setText(savedInstanceState.getString("comment", ""));
         this.tahini_CB.setChecked(savedInstanceState.getBoolean("tahini_checked", false));
         this.hummus_CB.setChecked(savedInstanceState.getBoolean("hummus_checked", false));
 
@@ -272,13 +218,11 @@ public class edit_order_activity_screen extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        //todo: is this even needed? doesnt onstop get called inside firestore_db_instance?
         super.onStop();
-
         save_to_sp();
     }
 
-    private void save_to_sp(){
+    private void save_to_sp() {
         SharedPreferences.Editor editor = mprefs.edit();
 
         editor.putString("pickles_num", this.num_of_pickles_tv.getText().toString());
@@ -298,12 +242,12 @@ public class edit_order_activity_screen extends AppCompatActivity {
         }
 
         this.num_of_pickles_tv.setText(mprefs.getString("pickles_num", "0"));
-        this.comment_et.setText(mprefs.getString("comment", "0"));
+        this.comment_et.setText(mprefs.getString("comment", ""));
         this.tahini_CB.setChecked(mprefs.getBoolean("tahini_checked?", false));
         this.hummus_CB.setChecked(mprefs.getBoolean("hummus_checked?", false));
     }
 
-    private void reset_fields(){
+    private void reset_fields() {
         num_of_pickles_tv.setText("0");
         comment_et.setText("");
         tahini_CB.setChecked(false);
